@@ -18,3 +18,13 @@ npm run service-test  src/features/user-service.feature
 npm run report
 
 
+## Rest-Assured Documentation
+
+Please refer docs folder, clone repo and open index.html from Doc folder for rest api doscumantation
+
+Refer: npm package that is used
+
+https://www.npmjs.com/package/rest-assured-ts
+
+
+
