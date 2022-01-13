@@ -1,0 +1,7 @@
+{
+  "code": 401,
+  "meta": null,
+  "data": {
+    "message": "Authentication failed"
+  }
+}

@@ -1,0 +1,167 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "sample-feature-file-implementation;create-item-with-sku-using-store-item-service",
+        "keyword": "Scenario Outline",
+        "line": 9,
+        "name": "Create item with SKU using store item service",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "GET api end point \"https://gorest.co.in/public-api/users\"",
+            "match": {
+              "location": "src/stepDefinitions/userServiceSteps.ts:17"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 338655398
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "verify status code \"200\"",
+            "match": {
+              "location": "src/stepDefinitions/userServiceSteps.ts:32"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 577343
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "json_path_parameter",
+                      "json_parameter_value"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "name",
+                      "Enakshi Tandon"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "email",
+                      "naik_chandra@lockman-wiegand.net"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "And ",
+            "line": 12,
+            "name": "validate user-service response includes",
+            "match": {
+              "location": "src/stepDefinitions/userServiceSteps.ts:62"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 3760856,
+              "error_message": "AssertionError: ==> Actual Json Response: \n                          Dorsey Powlowski,tgrwm,Ben Dover,Chi Doyle MD,Vaughn Harber,oravy,aicjc,Elton Mann MD,Alan,Blair Mertz,Janeth Rowe,Alan,Jackie Wisozk,Tawana Ullrich,Ben Dover,Ben Dover,George Lincoln,Mr. Jeremy Haley,Alan,Ms. Bruce Turcotte \n                \n                          ==> Below expected json response is not included either json path or value:\n                          Json path: name\n                             OR \n                          Value:  Enakshi Tandon\n    at validJsonPathWithRegularExpressionForMap (/Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:105:31)\n    at validateJsonResponse (/Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:364:9)\n    at World.<anonymous> (/Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/src/stepDefinitions/userServiceSteps.ts:71:23)"
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "sample-feature-file-implementation;make-get-call-and-validate-actual-response-against-json-response-file-template",
+        "keyword": "Scenario Outline",
+        "line": 22,
+        "name": "Make GET call and validate actual response against JSon response file template",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 23,
+            "name": "GET api end point \"https://gorest.co.in/public-api/users\"",
+            "match": {
+              "location": "src/stepDefinitions/userServiceSteps.ts:17"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 251891045
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 24,
+            "name": "verify status code \"200\"",
+            "match": {
+              "location": "src/stepDefinitions/userServiceSteps.ts:32"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 248162
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "json_path_parameter",
+                      "json_path_parameter_value"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "code",
+                      "400"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "data[*].id",
+                      "900"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "data[0].name",
+                      "{expected_first_name}"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "And ",
+            "line": 26,
+            "name": "validate user-service response against json response file with dynamic values \"testData/userresponse.json\"",
+            "match": {
+              "location": "src/stepDefinitions/userServiceSteps.ts:80"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 24495570,
+              "error_message": "AssertionError: Json parameter value not found for Key code: expected '400' to equal 200\n    at /Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:453:56\n    at Array.forEach (<anonymous>)\n    at iterateNestedObjects (/Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:443:30)\n    at deepCompareOfJsonObjects (/Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:433:9)\n    at /Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:381:13\n    at Generator.next (<anonymous>)\n    at fulfilled (/Users/kdeergasi/cucumbernewrepo/boilerplate-mocha-typescript/node_modules/typelearn1/lib/cjs/jsonValidationUtils.js:5:58)"
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "sample-feature-file-implementation",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Sample feature file implementation",
+    "tags": [],
+    "uri": "src/features/testapi.feature"
+  }
+]

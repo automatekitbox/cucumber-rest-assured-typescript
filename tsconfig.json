@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "allowUnreachableCode": false,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "alwaysStrict": false,
+    "resolveJsonModule": true,
+    "module": "commonjs",
+    "target": "esnext",
+    "lib": ["esnext", "DOM"],
+    "strictBindCallApply": true,
+    "removeComments": true,
+    "strictPropertyInitialization": true,
+    "strictNullChecks": true,
+    "baseUrl": "./types",
+    "rootDirs": [
+      "./config",
+      "./src/stepDefinitions",
+      "./src/support",
+      "./src/utils"
+    ],
+    "types": ["node"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "outDir": "build"
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/support/*.ts",
+    "./config/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

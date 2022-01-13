@@ -1,0 +1,153 @@
+{
+  "code": 200,
+  "meta": {
+    "pagination": {
+      "total": 1737,
+      "pages": 87,
+      "page": 1,
+      "limit": 20
+    }
+  },
+  "data": [
+    {
+      "id": 50,
+      "name": "Dulari Panicker",
+      "email": "dulari_panicker@carter.info",
+      "gender": "male",
+      "status": "active"
+    },
+    {
+      "id": 54,
+      "name": "Jitender Prajapat",
+      "email": "prajapat_jitender@block-mayert.co",
+      "gender": "female",
+      "status": "inactive"
+    },
+    {
+      "id": 59,
+      "name": "Mrs. Puneet edited",
+      "email": "mrs_puneet_talwar@durgan.name",
+      "gender": "female",
+      "status": "active"
+    },
+    {
+      "id": 60,
+      "name": "Amodini Kapoor III",
+      "email": "amodini_kapoor_iii@fay-ankunding.info",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 61,
+      "name": "Meena Kaul",
+      "email": "meena_kaul@murphy.biz",
+      "gender": "female",
+      "status": "inactive"
+    },
+    {
+      "id": 62,
+      "name": "Chandradev Pillai",
+      "email": "chandradev_pillai@weber-reichel.info",
+      "gender": "female",
+      "status": "inactive"
+    },
+    {
+      "id": 63,
+      "name": "Miss Anjaneya Kaul",
+      "email": "miss_anjaneya_kaul@farrell.info",
+      "gender": "male",
+      "status": "active"
+    },
+    {
+      "id": 64,
+      "name": "Kanti Malik",
+      "email": "malik_kanti@hodkiewicz.net",
+      "gender": "female",
+      "status": "inactive"
+    },
+    {
+      "id": 65,
+      "name": "Prasad Kocchar",
+      "email": "kocchar_prasad@schulist-mcclure.io",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 66,
+      "name": "Chapal Pothuvaal",
+      "email": "pothuvaal_chapal@yundt-stoltenberg.com",
+      "gender": "female",
+      "status": "inactive"
+    },
+    {
+      "id": 67,
+      "name": "Miss Aadi Butt",
+      "email": "butt_miss_aadi@vonrueden-breitenberg.com",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 68,
+      "name": "Shashi Kakkar",
+      "email": "shashi_kakkar@prosacco.io",
+      "gender": "female",
+      "status": "inactive"
+    },
+    {
+      "id": 69,
+      "name": "Chandira Nehru",
+      "email": "nehru_chandira@bashirian-mosciski.org",
+      "gender": "female",
+      "status": "active"
+    },
+    {
+      "id": 70,
+      "name": "Gati Guha",
+      "email": "gati_guha@schaefer.info",
+      "gender": "female",
+      "status": "active"
+    },
+    {
+      "id": 71,
+      "name": "Amb. Sunita Varman",
+      "email": "sunita_varman_amb@rowe.net",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 72,
+      "name": "Ajit Shah",
+      "email": "shah_ajit@armstrong-herzog.co",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 73,
+      "name": "Rameshwar Tagore",
+      "email": "tagore_rameshwar@zboncak.biz",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 74,
+      "name": "Prof. Ojaswini Acharya",
+      "email": "acharya_ojaswini_prof@hane.com",
+      "gender": "female",
+      "status": "active"
+    },
+    {
+      "id": 5,
+      "name": "Menka Asanmm",
+      "email": "asanmm_menka@crooks.biz",
+      "gender": "male",
+      "status": "inactive"
+    },
+    {
+      "id": 2,
+      "name": "Deeptimayee 2",
+      "email": "deeptimayee_dhawan@hahn.name",
+      "gender": "female",
+      "status": "inactive"
+    }
+  ]
+}

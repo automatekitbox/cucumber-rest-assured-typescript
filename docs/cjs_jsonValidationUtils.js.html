@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: cjs/jsonValidationUtils.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: cjs/jsonValidationUtils.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
+    return (mod &amp;&amp; mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isValidJson = exports.excludeJsonPathParameters = exports.replaceExactJsonFileNodeValues = exports.replaceExactJsonNodeValues = exports.deepCompareOfJsonObjects = exports.createJsonResponseObjectFromMap = exports.validateJsonResponseFile = exports.validateJsonResponse = exports.findNodeValue = exports.sendRequestParametersFromMap = exports.sendRequestBodyAsJsonFile = exports.sendRequestBodyAsFile = exports.findNodeByName = exports.readJsonToString = exports.readJsonToObject = exports.readJson = exports.validateJsonKeyValuePairFollowedByParentIndex = exports.validateJsonResponseFollowedByParentIndex = exports.replaceJsonPathFollowedByParentIndex = exports.validJsonPathWithRegularExpressionForMap = exports.invalidJsonPathWithRegularExpressionForMap = exports.validateJsonResponseNotIncludes = exports.prettyPrintJSON = void 0;
+const chai_1 = require("chai");
+const cucumber_1 = require("@cucumber/cucumber");
+const lodash_1 = require("lodash");
+const load_json_file_1 = __importDefault(require("load-json-file"));
+const jsonPath = require('jsonpath');
+/**
+ * This method is used to display JSON response in an easy-to-read format
+ * @param {object} json - JSON response
+ */
+function prettyPrintJSON(json) {
+    return JSON.stringify(json, null, " ");
+}
+exports.prettyPrintJSON = prettyPrintJSON;
+/**
+ * This method is used for the negative validation of JSON response after making REST call
+ * Json response should not contain json path parameter or values that are passed from feature file (DataTable) or Map
+ * Where sending input as JSON Response and DataTable or Map
+ * Where DataTable is a 2D array , sending row and columns as key value pair
+ * This will internally refer invalidJsonPathWithRegularExpressionForMap by passing JSON path(responseBody)
+ * invalidJsonPathWithRegularExpressionForMap: It validates JSON response with DataTable values
+ * @param {object} responseBody - json response after making REST call
+ * @param {DataTable | Map&lt;string, any>} jsonKeyValues - Send Json response path parameter and values as a Cucumber DataTable or Map
+ * @returns {void}
+ */
+function validateJsonResponseNotIncludes(responseBody, jsonKeyValues) {
+    let responseMap = new Map();
+    if (jsonKeyValues instanceof cucumber_1.DataTable) {
+        const readFeatureDataTable = jsonKeyValues.rows();
+        for (const [key, value] of readFeatureDataTable) {
+            if (readFeatureDataTable.hasOwnProperty(key)) {
+                console.log(() => `Key is: ${key} Value is: ${value}`);
+                responseMap.set(key, value);
+            }
+        }
+    }
+    else {
+        responseMap = jsonKeyValues;
+    }
+    invalidJsonPathWithRegularExpressionForMap(responseBody, responseMap);
+}
+exports.validateJsonResponseNotIncludes = validateJsonResponseNotIncludes;
+function invalidJsonPathWithRegularExpressionForMap(responseBody, datableFieldsInMap) {
+    for (const [actualPath, expectedValue] of datableFieldsInMap) {
+        const queryResult = jsonPath.query(responseBody, "$.." + actualPath);
+        console.log(() => `Json query result is: ${queryResult}`);
+        if (queryResult.length === 0) {
+            (0, chai_1.expect)(queryResult, `${queryResult} equals to ${expectedValue} OR ${actualPath} is present in response`)
+                .to.be.empty;
+            console.log(() => `${actualPath} is not present in response`);
+        }
+        else if (queryResult.toString().includes(",")) {
+            const queryResultValue = queryResult.toString().split(",");
+            (0, chai_1.assert)(queryResultValue.indexOf(expectedValue) === -1, `==> Actual Json Response: 
+                          ${queryResult} 
+                
+                          ==> Below expected json response is not included either json path or value:
+                          Json path: ${actualPath}
+                             OR 
+                          Value:  ${expectedValue}`);
+        }
+        else {
+            (0, chai_1.assert)(queryResult.some((x) => x.toString() !== expectedValue.toString()), `==> Actual Json Response: 
+                          ${queryResult} 
+                
+                          ==> Below expected json response is not included either json path or value:
+                          Json path: ${actualPath}
+                             OR 
+                          Value:  ${expectedValue}`);
+        }
+    }
+}
+exports.invalidJsonPathWithRegularExpressionForMap = invalidJsonPathWithRegularExpressionForMap;
+function validJsonPathWithRegularExpressionForMap(responseBody, responsemap) {
+    for (const [actualPath, expectedValue] of responsemap) {
+        const queryResult = jsonPath.query(responseBody, "$.." + actualPath);
+        console.log(() => `Json query result is: ${queryResult}`);
+        console.log(() => `Json expected value is json query result is: ${expectedValue}`);
+        if (expectedValue.includes(";")) {
+            expectedValue.split(";").forEach((value) => {
+                (0, chai_1.assert)(queryResult.some((val) => val === value), `==> Actual Json Response: 
+                          ${queryResult} 
+                
+                          ==> Below expected json response is not included either json path or value:
+                          Json path: ${actualPath}
+                             OR 
+                          Value:  ${expectedValue}`);
+            });
+        }
+        else {
+            (0, chai_1.assert)(queryResult.some((x) => x.toString() === expectedValue.toString()), `==> Actual Json Response: 
+                          ${queryResult} 
+                
+                          ==> Below expected json response is not included either json path or value:
+                          Json path: ${actualPath}
+                             OR 
+                          Value:  ${expectedValue}`);
+        }
+    }
+}
+exports.validJsonPathWithRegularExpressionForMap = validJsonPathWithRegularExpressionForMap;
+function replaceJsonPathFollowedByParentIndex(responseBody, parentnode, value) {
+    let parentNode = "";
+    const paths = jsonPath.paths(responseBody, "$.." + parentnode);
+    for (const index in paths) {
+        if (paths.hasOwnProperty(index)) {
+            const jsonpath = jsonPath.stringify(paths[index]);
+            const patharray = jsonpath.split(".");
+            const jsonvalue = jsonPath.value(responseBody, jsonpath.replace("$", "$."));
+            console.log(() => `Parent node Json value is: ${jsonvalue}`);
+            if (jsonvalue != null &amp;&amp; jsonvalue.toString() === value.toString()) {
+                parentNode = patharray[patharray.length - 2];
+                console.log(() => `Parent node is: ${parentNode}`);
+                return parentNode;
+            }
+        }
+    }
+    return parentNode;
+}
+exports.replaceJsonPathFollowedByParentIndex = replaceJsonPathFollowedByParentIndex;
+/**
+ * This method is used for validating JSON response followed by parent node index after making http request
+ * Where sending input as JSON Response and DataTable or Map
+ * Where DataTable is 2D array , sending row and columns as key value pair
+ * Constructing Map out of DataTable which is defined in feature file
+ * Constructed Map will contain json node(key) and value pair
+ * Json response should contain json key and values that are passed from feature file (DataTable)
+ * validateJsonMapFollowedByParentIndex: It validates map values with JSON response followed by parent node
+ * followed by responseBody JSON path and parent index.
+ * @param {string} parentNode - parent node
+ * @param {object} responseBody - response body
+ * @param {DataTable | Map&lt;string, any> } responseFields - json response key(path parameter) and value as Map or DataTable
+ * @returns {void}
+ */
+function validateJsonResponseFollowedByParentIndex(parentNode, responseBody, jsonKeyValues /*reading column values
+from feature file */) {
+    let responseMap = new Map();
+    if (jsonKeyValues instanceof cucumber_1.DataTable) {
+        const readFeatureDataTable = jsonKeyValues.rows();
+        for (const [key, value] of readFeatureDataTable) {
+            console.log(() => `Key is: ${key} and Value is: ${value}`);
+            responseMap.set(key, value);
+        }
+    }
+    else {
+        responseMap = jsonKeyValues;
+    }
+    validateJsonKeyValuePairFollowedByParentIndex(parentNode, responseBody, responseMap);
+}
+exports.validateJsonResponseFollowedByParentIndex = validateJsonResponseFollowedByParentIndex;
+function validateJsonKeyValuePairFollowedByParentIndex(parentKey, responseBody, responseMap
+/*reading column values
+  from feature file */ ) {
+    let replacewithParentNode = "";
+    let replaceNode = "";
+    for (let [actualPath, expectedValue] of responseMap) {
+        if (actualPath.includes(parentKey)) {
+            const actualparentNode = actualPath.split(".");
+            replaceNode = actualparentNode[actualparentNode.length - 2];
+            replacewithParentNode = replaceJsonPathFollowedByParentIndex(responseBody, parentKey, expectedValue);
+        }
+        console.log(() => `Replace node: ${replaceNode}`);
+        actualPath = actualPath.replace(replaceNode, replacewithParentNode);
+        console.log(() => `Actual path: ${actualPath}`);
+        const queryResult = jsonPath.query(responseBody, "$.." + actualPath);
+        if (expectedValue.toString().includes(";")) {
+            expectedValue.toString().split(";").forEach((value) => {
+                console.log(() => `Query result value is: ${value}`);
+                chai_1.assert.isTrue(queryResult.some((res) => res === value), `${actualPath} or ${value} is not present in response`);
+                console.log(() => `${actualPath} or ${value} is present in response`);
+            });
+        }
+        else {
+            chai_1.assert.strictEqual(queryResult.toString(), expectedValue.toString(), `${actualPath} or ${expectedValue} is not present in response`);
+            console.log(() => `${actualPath} or ${expectedValue} is present in response`);
+        }
+    }
+}
+exports.validateJsonKeyValuePairFollowedByParentIndex = validateJsonKeyValuePairFollowedByParentIndex;
+/**
+ * This method is used to read the JSON file from the path specified
+ * @param {string} jsonfilepath - JSON file path
+ */
+function readJson(jsonfilepath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return (0, load_json_file_1.default)(jsonfilepath);
+    });
+}
+exports.readJson = readJson;
+/**
+ * This method is used to read the JSON file from the specified path to create a JSON object
+ * @param {string} jsonfilepath - JSON file path
+ */
+function readJsonToObject(jsonfilepath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonFileAsObject = yield readJson(jsonfilepath);
+        return jsonFileAsObject;
+    });
+}
+exports.readJsonToObject = readJsonToObject;
+/**
+ * This method is used to read the JSON file from the specified path to create a JSON string
+ * @param {string} jsonfilepath - JSON file path
+ */
+function readJsonToString(jsonfilepath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonFileAsObject = yield readJson(jsonfilepath);
+        const jsonstr = JSON.stringify(jsonFileAsObject);
+        return jsonstr;
+    });
+}
+exports.readJsonToString = readJsonToString;
+/**
+ * This method is used to find the parent node by name
+ * @param {object} jsonData - JSON data
+ * @param {string} nodeName - name of the node
+ */
+function findNodeByName(jsonData, nodeName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const paths = jsonPath.paths(jsonData, "$.." + nodeName);
+        let nodes = [];
+        for (const index in paths) {
+            if (paths.hasOwnProperty(index)) {
+                nodes.push(jsonPath.stringify(paths[index]));
+            }
+        }
+        return nodes;
+    });
+}
+exports.findNodeByName = findNodeByName;
+/**
+ * This method is used to POST request parameters from the DataTable that are specified in the input json file
+ * These request parameters will replace for input json file object.
+ * Where input json file just template for request parameters
+ * @param {string} jsonFilepath - JSON file path
+ * @param {DataTable | Map&lt;string, any>} jsonKeyValuePair - response fields
+ */
+function sendRequestBodyAsFile(jsonFilepath, jsonKeyValuePair
+/*reading column values
+from feature file or map */ ) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let responseMap = new Map();
+        if (jsonKeyValuePair instanceof cucumber_1.DataTable) {
+            const readFeatureDataTable = jsonKeyValuePair.rows();
+            for (const [key, value] of readFeatureDataTable) {
+                console.log(() => `Key is: ${key} and Value is ${value}`);
+                responseMap.set(key, value);
+            }
+        }
+        else {
+            responseMap = jsonKeyValuePair;
+        }
+        return sendRequestParametersFromMap(jsonFilepath, responseMap);
+    });
+}
+exports.sendRequestBodyAsFile = sendRequestBodyAsFile;
+/**
+ * This method is used to POST request parameters from the DataTable that are specified in the input json file
+ * These request parameters will replace for input json file object.
+ * Where input json file just template for request parameters
+ * Note: Need to provide exact json path to replace node values
+ * @param {string} jsonFilepath - JSON file path
+ * @param {DataTable} responseFields - response fields
+ */
+function sendRequestBodyAsJsonFile(jsonFilepath, jsonKeyValuePair
+/*reading column values
+from feature file */ ) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let responsemap = new Map();
+        if (jsonKeyValuePair instanceof cucumber_1.DataTable) {
+            const readFeatureDataTable = jsonKeyValuePair.rows();
+            for (const [key, value] of readFeatureDataTable) {
+                console.log(() => `Key is: ${key} and Value is ${value}`);
+                responsemap.set(key, value);
+            }
+        }
+        else {
+            responsemap = jsonKeyValuePair;
+        }
+        return replaceExactJsonFileNodeValues(jsonFilepath, responsemap);
+    });
+}
+exports.sendRequestBodyAsJsonFile = sendRequestBodyAsJsonFile;
+/**
+ * This method is used to send request json key value pair from the DataTable as Map specified in the input json file
+ * These request parameters will replace for input json file object.
+ * Where input json file just template for request parameters
+ * @param {string} jsonFilepath - JSON file path
+ * @param {Map&lt;string, any>} dataTableFieldsInMap - data table fields Map
+ */
+function sendRequestParametersFromMap(jsonFilepath, dataTableFieldsInMap
+/*reading column values
+   from feature file */ ) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonFileObject = yield readJsonToObject(jsonFilepath);
+        for (const [key, expectedValue] of dataTableFieldsInMap) {
+            jsonPath.apply(jsonFileObject, "$.." + key, (value) => {
+                value = expectedValue;
+                console.log(value);
+                return value;
+            });
+        }
+        return JSON.stringify(jsonFileObject);
+    });
+}
+exports.sendRequestParametersFromMap = sendRequestParametersFromMap;
+/**
+ * This method is used to find the parent node value by node name
+ * @param {object} jsonData - JSON data
+ * @param {string} nodename - name of the node
+ */
+function findNodeValue(jsonData, nodeName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const paths = jsonPath.paths(jsonData, "$.." + nodeName);
+        const arrayOfNodeValues = [];
+        for (const index in paths) {
+            if (paths.hasOwnProperty(index)) {
+                const pathExpression = jsonPath.stringify(paths[index]).replace("$.", "$..");
+                const nodeValues = jsonPath.query(jsonData, pathExpression);
+                arrayOfNodeValues.push(...nodeValues);
+            }
+        }
+        return arrayOfNodeValues;
+    });
+}
+exports.findNodeValue = findNodeValue;
+/**
+ * This method is used for validation of JSON response after making http request by giving JSON path
+ * returns the table as a 2-D array, without the first row
+ * where first row from datatable using it as column headers.
+ * validJsonPathWithRegularExpressionForMap: It validates JSON response passed as key and value pair
+ * after making service(REST) call, where key is JSON node(path) name and value is JSON node(path)
+ * value with the responseBody JSON path.
+ * @param {object} jsoneResponse - json response body as an object
+ * @param {DataTable | Map&lt;string, string>} jsonResponseKeyValuePair - send json path and corrosponding value as in the form of DataTable or Map
+ * @returns {void}
+ */
+function validateJsonResponse(jsonResponse, jsonResponseKeyValuePair
+/*reading column values from feature file */ ) {
+    if (jsonResponseKeyValuePair instanceof cucumber_1.DataTable) {
+        const readFeatureDataTable = jsonResponseKeyValuePair.rows();
+        const responseMap = new Map();
+        for (let [key, value] of readFeatureDataTable) {
+            responseMap.set(key, value);
+        }
+        console.log(() => `readFeatureDataTable :  ${JSON.stringify(responseMap)}`);
+        validJsonPathWithRegularExpressionForMap(jsonResponse, responseMap);
+    }
+    else {
+        validJsonPathWithRegularExpressionForMap(jsonResponse, jsonResponseKeyValuePair);
+    }
+}
+exports.validateJsonResponse = validateJsonResponse;
+/**
+ * This method is used to validate json response objects
+ * These input json response file converting as json object.
+ * Where internally calls deepCompareOfJsonObjects method to validate two json objects
+ * @param {string} jsonResponseFilepath - JSON Response as Input File
+ * @param {object} actualJsonResponseObject - Getting json response after making REST call
+ * @returns {Promise&lt;void>} - returns nothing
+ */
+function validateJsonResponseFile(jsonResponseFilepath, actualJsonResponseObject, jsonkeyValue) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonfileobject = yield readJsonToObject(jsonResponseFilepath);
+        if (jsonkeyValue !== null &amp;&amp; jsonkeyValue instanceof Map) {
+            const expectedResponseObject = yield createJsonResponseObjectFromMap(jsonResponseFilepath, jsonkeyValue);
+            deepCompareOfJsonObjects(expectedResponseObject, actualJsonResponseObject);
+        }
+        else if (jsonkeyValue !== null &amp;&amp; jsonkeyValue instanceof cucumber_1.DataTable) {
+            const readFeatureDataTable = jsonkeyValue.rows();
+            const responseMap = new Map();
+            for (let [key, value] of readFeatureDataTable) {
+                responseMap.set(key, value);
+            }
+            console.log(() => `readFeatureDataTable :  ${JSON.stringify(responseMap)}`);
+            const expectedResponseObject = yield createJsonResponseObjectFromMap(jsonResponseFilepath, responseMap);
+            deepCompareOfJsonObjects(expectedResponseObject, actualJsonResponseObject);
+        }
+        else {
+            deepCompareOfJsonObjects(jsonfileobject, actualJsonResponseObject);
+        }
+    });
+}
+exports.validateJsonResponseFile = validateJsonResponseFile;
+/**
+ * This method is used to read response file in json format as well parameters as Map
+ * Where values of Map needs to be replaced in the input json file object
+ * Where input response json file just template for request parameters
+ * @param {string} jsonResponseFilepath - JSON file path
+ * @param {Map&lt;string, string>} dataTableFieldsInMap - data table fields Map
+ * @returns {object} - Returns Json object
+ */
+function createJsonResponseObjectFromMap(jsonResponseFilepath, dataTableFieldsInMap
+/*reading column values
+   from feature file */ ) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonfileObject = yield readJsonToObject(jsonResponseFilepath);
+        for (const [key, expectedValue] of dataTableFieldsInMap) {
+            jsonPath.apply(jsonfileObject, "$.." + key, (value) => {
+                value = expectedValue;
+                console.log(() => `${value}`);
+                return value;
+            });
+        }
+        return jsonfileObject;
+    });
+}
+exports.createJsonResponseObjectFromMap = createJsonResponseObjectFromMap;
+/**
+ * This method is used to compare of two json objects by every Key
+ * Which gives exactly Key that fails for particular test
+ * Where passing two json objects as inputs
+ * @param {object} expectedJsonObject - First json object
+ * @param {object} actualJsonObject - second json object that needs to be compared
+ * @returns {void} - Returns Json object
+ */
+function deepCompareOfJsonObjects(actualJsonObject, expectedJsonObject) {
+    if (Object.keys(actualJsonObject).length === Object.keys(expectedJsonObject).length) {
+        iterateNestedObjects(actualJsonObject, expectedJsonObject);
+        iterateNestedObjects(expectedJsonObject, actualJsonObject);
+    }
+    else {
+        //Validating when expectedJsonObject keys length is less or greater than actualJsonObject keys
+        (0, chai_1.expect)(JSON.stringify(actualJsonObject)).to.be.equals(JSON.stringify(expectedJsonObject));
+    }
+}
+exports.deepCompareOfJsonObjects = deepCompareOfJsonObjects;
+const iterateNestedObjects = (expectedobj, actualobj) => {
+    Object.keys(expectedobj).forEach((key) => {
+        // @ts-ignore
+        if (typeof expectedobj[key] === "object" &amp;&amp; expectedobj[key] !== null) {
+            // @ts-ignore
+            iterateNestedObjects(expectedobj[key], actualobj[key]);
+        }
+        else {
+            // @ts-ignore
+            console.log(() => `expected json parameter value: ${expectedobj[key]}  actual json parameter value: ${actualobj[key]}`);
+            // @ts-ignore
+            (0, chai_1.expect)(expectedobj[key]).to.be.equals(actualobj[key], `Json parameter value not found for Key ${key}`);
+        }
+    });
+};
+function convertObjectToString(value) {
+    return (value === null) ? "" : value.toString();
+}
+/**
+ * This method is used to replace required json path parameter values on the json request or response object
+ * Note: Need to provide exact json path to replace node values
+ * Where input json file just template for json path parameters
+ * @param {object} jsonObject - JSON request/response object
+ * @param {Map&lt;string, string>} dataTableFieldsInMap - dataTable fields reading from the feature file
+ * and sending it as Map
+ */
+function replaceExactJsonNodeValues(jsonObject, dataTableFieldsInMap) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const [key, expectedValue] of dataTableFieldsInMap) {
+            jsonPath.apply(jsonObject, "$." + key, (value) => {
+                value = expectedValue;
+                console.log(value);
+                return value;
+            });
+        }
+        return JSON.stringify(jsonObject);
+    });
+}
+exports.replaceExactJsonNodeValues = replaceExactJsonNodeValues;
+function replaceExactJsonFileNodeValues(jsonFilePath, dataTableFieldsInMap) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonFileAsObject = yield readJson(jsonFilePath);
+        for (const [key, expectedValue] of dataTableFieldsInMap) {
+            jsonPath.apply(jsonFileAsObject, "$." + key, (value) => {
+                value = expectedValue;
+                console.log(value);
+                return value;
+            });
+        }
+        return JSON.stringify(jsonFileAsObject);
+    });
+}
+exports.replaceExactJsonFileNodeValues = replaceExactJsonFileNodeValues;
+/**
+ * This method is used to exclude Json Path parameters(keys) from request body or response body
+ * Note: Need to provide exact json path to replace node values
+ * @param {string | object} requestBody - request body sending it as string or JSON object
+ * @param {DataTable | Map&lt;string, string> | string[]} dataTableFieldsInMap - dataTable fields reading from the feature file
+ * and sending it as Map or string array
+ * Note: |key1| {exclude_path_parameter}|
+ * key1 is path parameter value is {exclude_path_parameter} in the dataTable or Map
+ */
+function excludeJsonPathParameters(requestBody, jsonKeyValues) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const jsonObject = (typeof requestBody === "string") ? JSON.parse(requestBody) : requestBody;
+        if (jsonKeyValues instanceof cucumber_1.DataTable) {
+            const readData = jsonKeyValues.rows();
+            for (const [key, value] of readData) {
+                if (value.toString().includes("{exclude_path_parameter}")) {
+                    (0, lodash_1.unset)(jsonObject, key);
+                }
+            }
+        }
+        else if (jsonKeyValues instanceof Map) {
+            for (const [key, value] of jsonKeyValues) {
+                if (value.toString().includes("{exclude_path_parameter}")) {
+                    (0, lodash_1.unset)(jsonObject, key);
+                }
+            }
+        }
+        else {
+            for (const key of jsonKeyValues) {
+                (0, lodash_1.unset)(jsonObject, key);
+            }
+        }
+        return JSON.stringify(jsonObject);
+    });
+}
+exports.excludeJsonPathParameters = excludeJsonPathParameters;
+/**
+ * This method is used to validate response body whether json or not
+ * Note: Other than json means, response could xml, nor mal string or html etc
+ * @param {any} responseBody - response body after making http(Rest) call
+ * @returns {boolean} - Returns true if it is valid json otherwise false
+ */
+function isValidJson(responseBody) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            JSON.parse(responseBody);
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
+    });
+}
+exports.isValidJson = isValidJson;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createJsonResponseObjectFromMap">createJsonResponseObjectFromMap</a></li><li><a href="global.html#deepCompareOfJsonObjects">deepCompareOfJsonObjects</a></li><li><a href="global.html#excludeJsonPathParameters">excludeJsonPathParameters</a></li><li><a href="global.html#findNodeByName">findNodeByName</a></li><li><a href="global.html#findNodeValue">findNodeValue</a></li><li><a href="global.html#isValidJson">isValidJson</a></li><li><a href="global.html#prettyPrintJSON">prettyPrintJSON</a></li><li><a href="global.html#readJson">readJson</a></li><li><a href="global.html#readJsonToObject">readJsonToObject</a></li><li><a href="global.html#readJsonToString">readJsonToString</a></li><li><a href="global.html#replaceExactJsonNodeValues">replaceExactJsonNodeValues</a></li><li><a href="global.html#sendRequestBodyAsFile">sendRequestBodyAsFile</a></li><li><a href="global.html#sendRequestBodyAsJsonFile">sendRequestBodyAsJsonFile</a></li><li><a href="global.html#sendRequestParametersFromMap">sendRequestParametersFromMap</a></li><li><a href="global.html#validateJsonResponse">validateJsonResponse</a></li><li><a href="global.html#validateJsonResponseFile">validateJsonResponseFile</a></li><li><a href="global.html#validateJsonResponseFollowedByParentIndex">validateJsonResponseFollowedByParentIndex</a></li><li><a href="global.html#validateJsonResponseNotIncludes">validateJsonResponseNotIncludes</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Jan 14 2022 03:39:05 GMT+0530 (India Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
