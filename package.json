@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "boilerplate-cucumber-typescript",
-  "description": "",
-  "version": "0.0.0",
+  "name": "cucumber-rest-assured-typescript",
+  "description": "cucumber-rest-assured-typescript or cucumber rest-assured javascript",
+  "version": "0.0.1",
   "license": "MIT",
   "author": {
     "name": "Krishna Deergasi",
@@ -15,7 +15,7 @@
     "clean-build": "npm run clean && npm run build",
     "test": "mocha src/**/*.spec.ts",
     "report": "node build/config/report.js",
-    "service-path": "cucumber-js --publish stepDefinitions --require 'build/src/support/hooks.js' --require 'src/stepDefinitions/*.ts' -f json:./report/cucumber_report.json --require-module ts-node/register --exit"
+    "service-test": "cucumber-js --publish stepDefinitions --require 'build/src/support/hooks.js' --require 'src/stepDefinitions/*.ts' -f json:./report/cucumber_report.json --require-module ts-node/register --exit"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^8.0.0-rc.1",
