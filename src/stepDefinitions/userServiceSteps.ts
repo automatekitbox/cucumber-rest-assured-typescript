@@ -5,7 +5,7 @@ import {
   readJsonToString,
   restRequest, sendRequestBodyAsJsonFile,
   validateJsonResponse, validateJsonResponseFile
-} from "typelearn1";
+} from "rest-assured-ts";
 import {UserServiceUtils} from "../utils/userserviceutils";
 
 

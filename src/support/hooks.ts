@@ -1,4 +1,4 @@
-import {generateCucumberReport} from "typelearn1";
+import {generateCucumberReport} from "rest-assured-ts";
 
 const {AfterAll, BeforeAll } = require('@cucumber/cucumber');
 
