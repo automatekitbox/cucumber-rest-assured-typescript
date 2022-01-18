@@ -20,7 +20,7 @@ npm run report
 
 ## Rest-Assured Documentation
 
-Please refer docs folder, clone repo and open index.html from Doc folder for rest api doscumantation
+Please refer docs folder, clone repo and open index.html from Doc folder for rest api documentation
 
 Refer: npm package that is used
 
