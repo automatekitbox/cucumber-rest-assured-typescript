@@ -13,6 +13,10 @@ npm run service-test  src/features/*.features
 
 npm run service-test  src/features/user-service.feature
 
+## NOTE if you are using WINDOWS , change below target in package.json
+
+"service-test": "cucumber-js --publish stepDefinitions --require build/src/support/hooks.js --require src/stepDefinitions/*.ts -f json:./report/cucumber_report.json --require-module ts-node/register --exit"
+
 ## To Generate Cucumber Report
 
 npm run report
